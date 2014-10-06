@@ -90,7 +90,7 @@ def writeHeader(varKeys,varInfo):
 	f.write('                                                                                \n')
 	f.write('  	// branch variables\n')
 	for key in varKeys:
-		f.write('    %-15s %-40s\n'%(varInfo[key][0],key+';'))
+		f.write('    %-15s %-40s\n'%(varInfo[key][0],'*'+key+';'))
 	f.write('\n')
 	f.write(' 	// branch definitions\n')
 	for key in varKeys:
@@ -128,10 +128,13 @@ def writeSrc():
 	f.write('	firstEntry(-1),                                                                  \n')
 	f.write('	lastEntry(-1)                                                                    \n')
 	f.write('{                                                                                  \n')
+	f.write('	branchDefClass->initialiseVariables(this); 			                                 \n')
 	f.write('	branchDefClass->setOutputBranches(this,outTree);                                 \n')
 	f.write('}                                                                                  \n')
 	f.write('                                                                                   \n')
-	f.write('Looper::~Looper(){}                                                                \n')
+	f.write('Looper::~Looper(){                                                                \n')
+	f.write(' branchDefClass->cleanVariables(this);                                            \n')
+	f.write('} 									                                                                \n')
 	f.write('                                                                                   \n')
 	f.write('void Looper::addTreeContainer(TTree *tree, TString _name, int _itype, int _sqrts) {\n')
 	f.write('                                                                                   \n')

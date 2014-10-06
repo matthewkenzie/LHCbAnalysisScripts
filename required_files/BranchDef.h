@@ -15,6 +15,8 @@ class BranchDef {
 		BranchDef();
 		virtual ~BranchDef() = 0;
 
+		virtual void initialiseVariables(Looper *l) = 0;
+		virtual void cleanVariables(Looper *l) = 0;
 		virtual void setInputBranches(Looper *l, TTree *tree) = 0;
 		virtual void setOutputBranches(Looper *l, TTree *tree) = 0;
 

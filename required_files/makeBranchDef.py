@@ -69,6 +69,8 @@ def writeHeader():
 	f.write('		%s(); 																                               			\n'%opts.classname)
 	f.write('		~%s(); 		                                                							 	\n'%opts.classname)
 	f.write('                                                                             \n')
+	f.write('		virtual void initialiseVariables(Looper *l); 															\n')
+	f.write('		virtual void cleanVariables(Looper *l); 							 										\n')
 	f.write('		virtual void setInputBranches(Looper *l, TTree *tree); 										\n')
 	f.write('		virtual void setOutputBranches(Looper *l, TTree *tree); 									\n')
 	f.write('\n')
@@ -82,6 +84,9 @@ def writeHeader():
 	print 'Written new file: ', f.name
 
 def writeSrc():
+
+	varKeys = variableDict.keys()
+	varKeys.sort()
 
 	f = open(srcname,'w')
 	f.write('///////////////////////////////////////\n')
@@ -97,20 +102,15 @@ def writeSrc():
 
 	# write contructor here
 	f.write('%s::%s(){} 																	 \n'%(opts.classname,opts.classname))
-	f.write('\n')
 
 	# write destructor here
 	f.write('%s::~%s(){} 																	 \n'%(opts.classname,opts.classname))
-	f.write('\n')
-
-	varKeys = variableDict.keys()
-	varKeys.sort()
 
 	# write setInputBranches() here
 	f.write('void %s::setInputBranches(Looper *l, TTree *tree){ \n'%opts.classname)
 	for key in varKeys:
 		if variableDict[key][2]>0: continue # write only
-		line = 'tree->SetBranchAddress("%s", &(l->%s), &(l->b_%s));\n'%(key,key,key)
+		line = 'tree->SetBranchAddress("%s", l->%s, &(l->b_%s));\n'%(key,key,key)
 		if variableDict[key][1]<0: # this is MC only
 			line = "if (l->itype<0) "+line
 		if variableDict[key][1]>0: # this is data only
@@ -120,13 +120,30 @@ def writeSrc():
 	f.write('}\n')
 	f.write('\n')
 
+	# write initialiseVariables() here
+	f.write('void %s::initialiseVariables(Looper *l) {\n'%opts.classname)
+	for key in varKeys:
+		line = '%-40s = new %s(0);\n'%('l->'+key,variableDict[key][0])
+		f.write('\t'+line)
+	f.write('\n')
+	f.write('}\n')
+	f.write('\n')
+
+	# write cleanVariables() here
+	f.write('void %s::cleanVariables(Looper *l) {\n'%opts.classname)
+	for key in varKeys:
+		line = 'delete l->%s;\n'%key
+		f.write('\t'+line)
+	f.write('}\n')
+	f.write('\n')
+
 	# write setOutputBranches() here
 	f.write('void %s::setOutputBranches(Looper *l, TTree *tree){ \n'%opts.classname)
 	f.write('\ttree->Branch("itype",&(l->itype));\n')
 	f.write('\ttree->Branch("sqrts",&(l->sqrts));\n')
 	for key in varKeys:
 		if variableDict[key][2]<0: continue # read only
-		line = 'tree->Branch("%s",&(l->%s));\n'%(key,key)
+		line = 'tree->Branch("%s",l->%s);\n'%(key,key)
 		f.write('\t'+line)
 	f.write('}\n')
 	f.write('\n')

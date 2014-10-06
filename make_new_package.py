@@ -21,7 +21,7 @@ def mkdir(subloc):
 
 def linkFile(name, subloc):
 
-	target_loc = os.path.abspath(os.path.join(opts.location,opts.packageName,subloc,name))
+	target_loc = os.path.abspath(os.path.join(opts.location,opts.packageName,subloc,os.path.basename(name)))
 	source_loc = os.path.abspath(os.path.join('required_files',name))
 	os.system('ln -s %s %s'%(source_loc,target_loc))
 	print '  -- ', 'Linked file', name, 'to', subloc
@@ -35,13 +35,14 @@ mkdir('dat')
 mkdir('python')
 mkdir('scripts')
 
-os.system('touch %s/%s/python/__init__.py'%(opts.location,opts.packageName))
-
 linkFile('BranchDef.h','interface')
 linkFile('BranchDef.cc','src')
 linkFile('BaseAnalyser.h','interface')
 linkFile('BaseAnalyser.cc','src')
-linkFile('configProducer.py','python')
+linkFile('Runner.h','interface')
+linkFile('Runner.cc','src')
+linkFile('python/configProducer.py','python')
+linkFile('python/__init__.py','python')
 linkFile('dumpTreeBranches.py','scripts')
 linkFile('makeBranchDef.py','scripts')
 linkFile('makeLooper.py','scripts')

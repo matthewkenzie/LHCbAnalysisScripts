@@ -23,7 +23,6 @@ class BaseAnalyser {
 		virtual void Init(Looper *l) = 0; // no implementation here
 		virtual void Term(Looper *l) = 0; // no implementation here
 		virtual bool AnalyseEvent(Looper *l) = 0; // no implementation here
-		virtual void checkBranches() = 0 ; // no implementation here
 
 		TString name;
 
